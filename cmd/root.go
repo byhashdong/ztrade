@@ -87,16 +87,18 @@ func init() {
 				log.SetOutput(logF)
 			}
 		}
+
 		if debug {
 			log.SetLevel(log.DebugLevel)
 		}
-		if !runPprof {
-			return
-		}
-		go func() {
-			http.ListenAndServe("0.0.0.0:8088", nil)
-		}()
 
+		if runPprof {
+			go func() {
+				if err := http.ListenAndServe("0.0.0.0:8088", nil); err != nil {
+					log.Error("run pprof failed:", err.Error())
+				}
+			}()
+		}
 	}
 }
 
