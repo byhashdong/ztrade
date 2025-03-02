@@ -35,8 +35,8 @@ func init() {
 	tradeCmd.PersistentFlags().StringVarP(&rptFile, "report", "o", "report.html", "output report html file path")
 	tradeCmd.PersistentFlags().StringVarP(&binSize, "binSize", "b", "1m", "binSize: 1m,5m,15m,1h,1d")
 	tradeCmd.PersistentFlags().StringVar(&symbol, "symbol", "XBTUSD", "symbol")
-	tradeCmd.PersistentFlags().StringVar(&exchangeName, "exchange", "bitmex", "exchage name, only support bitmex current now")
-	tradeCmd.PersistentFlags().IntVarP(&recentDay, "recent", "r", 1, "load recent (n) day datas,default 1")
+	tradeCmd.PersistentFlags().StringVar(&exchangeName, "exchange", "bitmex", "exchange name, only support bitmex current now")
+	tradeCmd.PersistentFlags().IntVarP(&recentDay, "recent", "r", 1, "load recent (n) day data,default 1")
 	tradeCmd.PersistentFlags().StringVar(&param, "param", "", "param json string")
 }
 
@@ -70,19 +70,27 @@ func runTrade(cmd *cobra.Command, args []string) {
 	go func() {
 		sig := <-gracefulStop
 		fmt.Printf("caught sig: %+v", sig)
-		real.Stop()
+		_ = real.Stop()
 	}()
 	err = real.Start()
 	if err != nil {
 		log.Fatal("trade error:", err.Error())
 	}
-	real.Wait()
-	fmt.Println("begin to geneate report to ", rptFile)
+
+	err = real.Wait()
+	if err != nil {
+		log.Fatal("trade error:", err.Error())
+	}
+
+	log.Info("begin to generate report to ", rptFile)
 	err = r.GenRPT(rptFile)
 	if err != nil {
 		return
 	}
+
 	fmt.Println("open report ", rptFile)
 	err = common.OpenURL(rptFile)
-	return
+	if err != nil {
+		log.Fatal("open report error:", err.Error())
+	}
 }
