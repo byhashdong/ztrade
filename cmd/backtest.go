@@ -52,7 +52,7 @@ func init() {
 	backtestCmd.PersistentFlags().Float64VarP(&lever, "lever", "", 1, "lever")
 	backtestCmd.PersistentFlags().BoolVarP(&simpleReport, "console", "", false, "print report to console")
 	backtestCmd.PersistentFlags().StringVarP(&rptDB, "reportDB", "d", "", "save all actions to sqlite db")
-	initTimerange(backtestCmd)
+	initTimeRange(backtestCmd)
 }
 
 func runBacktest(cmd *cobra.Command, args []string) {
@@ -60,7 +60,7 @@ func runBacktest(cmd *cobra.Command, args []string) {
 		log.Fatal("strategy file can't be empty")
 		return
 	}
-	startTime, endTime, err := parseTimerange()
+	startTime, endTime, err := parseTimeRange()
 	if err != nil {
 		log.Fatal(err.Error())
 		return
@@ -107,6 +107,7 @@ func runBacktest(cmd *cobra.Command, args []string) {
 	if err != nil {
 		return
 	}
+
 	if rptDB != "" {
 		err = r.ExportToDB(rptDB)
 		if err != nil {
@@ -115,5 +116,7 @@ func runBacktest(cmd *cobra.Command, args []string) {
 		}
 	}
 	err = common.OpenURL(rptFile)
-	return
+	if err != nil {
+		log.Fatal("open url failed:", err.Error())
+	}
 }

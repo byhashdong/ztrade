@@ -25,13 +25,13 @@ var (
 
 func init() {
 	rootCmd.AddCommand(downloadCmd)
-	initTimerange(downloadCmd)
+	initTimeRange(downloadCmd)
 	bAuto = downloadCmd.PersistentFlags().BoolP("auto", "a", false, "auto download")
 }
 
 func runDownload(cmd *cobra.Command, args []string) {
 	cfg := viper.GetViper()
-	startTime, endTime, err := parseTimerange()
+	startTime, endTime, err := parseTimeRange()
 	if err != nil {
 		log.Fatal(err.Error())
 		return
